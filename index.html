@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CommuteCast | Smart Weather Companion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <p class="eyebrow">YOUR DAILY WEATHER COMPANION</p>
+        <h1>Commute<span>Cast</span> 🌦️</h1>
+        <p class="subtitle">
+          Smart weather advice for your daily journey.
+        </p>
+      </div>
+
+      <button id="locationBtn" class="location-btn">
+        📍 Use My Location
+      </button>
+    </header>
+
+    <section class="search-box">
+      <input
+        type="text"
+        id="cityInput"
+        placeholder="Enter your city..."
+        autocomplete="off"
+      />
+      <button id="searchBtn">Search</button>
+    </section>
+
+    <p id="errorMessage" class="error-message"></p>
+
+    <section id="weatherSection" class="weather-section">
+      <div class="current-weather card">
+        <div>
+          <p id="locationName" class="location-name">Search for a city</p>
+          <p id="weatherDescription" class="weather-description">
+            Weather information will appear here
+          </p>
+          <h2 id="temperature">--°C</h2>
+          <p id="feelsLike">Feels like --°C</p>
+        </div>
+
+        <div id="weatherIcon" class="weather-icon">🌤️</div>
+      </div>
+
+      <div class="advice-card card">
+        <p class="card-label">TODAY'S COMMUTE ADVICE</p>
+        <h3 id="commuteAdvice">Search for your location</h3>
+        <p id="commuteMessage">
+          We’ll tell you what to expect before you travel.
+        </p>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-card card">
+          <span>☔</span>
+          <p>Umbrella</p>
+          <strong id="umbrellaAdvice">--</strong>
+        </div>
+
+        <div class="detail-card card">
+          <span>🧥</span>
+          <p>Clothing</p>
+          <strong id="clothingAdvice">--</strong>
+        </div>
+
+        <div class="detail-card card">
+          <span>💨</span>
+          <p>Wind Speed</p>
+          <strong id="windSpeed">-- km/h</strong>
+        </div>
+
+        <div class="detail-card card">
+          <span>💧</span>
+          <p>Humidity</p>
+          <strong id="humidity">--%</strong>
+        </div>
+      </div>
+
+      <div class="extra-details card">
+        <div>
+          <span>🌅 Sunrise</span>
+          <strong id="sunrise">--</strong>
+        </div>
+
+        <div>
+          <span>🌇 Sunset</span>
+          <strong id="sunset">--</strong>
+        </div>
+
+        <div>
+          <span>🌧️ Rain Chance</span>
+          <strong id="rainChance">--%</strong>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Made with HTML, CSS, JavaScript & Weather API 💻</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
