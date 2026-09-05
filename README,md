@@ -1,0 +1,44 @@
+# 🌦️ CommuteCast
+
+A niche weather application designed to help students and daily commuters
+make better travel decisions based on current weather conditions.
+
+## ✨ Features
+
+- 🔍 Search weather by city
+- 📍 Get weather using your current location
+- 🌡️ Display current temperature
+- 💨 Show wind speed and humidity
+- 🌅 Display sunrise and sunset
+- ☔ Umbrella recommendation
+- 🧥 Clothing recommendation
+- 🚶 Commute advice
+- 🌙 Light and dark theme
+- 📱 Responsive design
+
+## 🛠️ Technologies Used
+
+- HTML
+- CSS
+- JavaScript
+- Open-Meteo Weather API
+
+## 🚀 How to Run
+
+1. Clone the repository.
+2. Open `index.html` in a browser.
+3. Search for a city or use your current location.
+
+## 📚 Learning Outcomes
+
+- Working with APIs
+- Using JavaScript fetch and async/await
+- Handling user input
+- Updating the DOM dynamically
+- Using browser geolocation
+- Creating responsive interfaces
+- Managing projects with Git and GitHub
+
+## 👨‍💻 Author
+
+Suryansh
