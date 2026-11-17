@@ -26,28 +26,41 @@ export function categorizeUsAqi(value) {
   return { value: aqi, label: 'Hazardous', color: '#881337', severity: 'hazardous' };
 }
 
-// European AQI (1 to 5) Categorization according to EAQI standard
+// European AQI Categorization according to EAQI / CAQI standard
+// Open-Meteo returns continuous index (0-20: Good, 20-40: Fair, 40-60: Moderate, 60-80: Poor, 80+: Very Poor)
 export function categorizeEuropeanAqi(value) {
   if (value === null || value === undefined || isNaN(value)) {
-    return { value: null, label: 'Unknown', color: '#64748b', severity: 'unknown' };
+    return { value: null, band: null, label: 'Unknown', color: '#64748b', severity: 'unknown' };
   }
-  const eaqi = Math.round(value);
 
-  switch (eaqi) {
-    case 1:
-      return { value: 1, label: 'Good', color: '#3b82f6', severity: 'good' };
-    case 2:
-      return { value: 2, label: 'Fair', color: '#10b981', severity: 'fair' };
-    case 3:
-      return { value: 3, label: 'Moderate', color: '#eab308', severity: 'moderate' };
-    case 4:
-      return { value: 4, label: 'Poor', color: '#ef4444', severity: 'poor' };
-    case 5:
-    case 6:
-      return { value: 5, label: 'Very Poor', color: '#7f1d1d', severity: 'very_poor' };
-    default:
-      return { value: eaqi, label: 'Moderate', color: '#eab308', severity: 'moderate' };
+  const num = Math.round(value);
+
+  // If already mapped to 1..5 band
+  if (num <= 5 && num >= 1) {
+    const bands = {
+      1: { band: 1, label: 'Good', color: '#3b82f6', severity: 'good' },
+      2: { band: 2, label: 'Fair', color: '#10b981', severity: 'fair' },
+      3: { band: 3, label: 'Moderate', color: '#eab308', severity: 'moderate' },
+      4: { band: 4, label: 'Poor', color: '#ef4444', severity: 'poor' },
+      5: { band: 5, label: 'Very Poor', color: '#7f1d1d', severity: 'very_poor' },
+    };
+    return { value: num, ...bands[num] };
   }
+
+  // If continuous score (Open-Meteo 0-100+ range)
+  if (num <= 20) {
+    return { value: num, band: 1, label: 'Good', color: '#3b82f6', severity: 'good' };
+  }
+  if (num <= 40) {
+    return { value: num, band: 2, label: 'Fair', color: '#10b981', severity: 'fair' };
+  }
+  if (num <= 60) {
+    return { value: num, band: 3, label: 'Moderate', color: '#eab308', severity: 'moderate' };
+  }
+  if (num <= 80) {
+    return { value: num, band: 4, label: 'Poor', color: '#ef4444', severity: 'poor' };
+  }
+  return { value: num, band: 5, label: 'Very Poor', color: '#7f1d1d', severity: 'very_poor' };
 }
 
 // Generate commuter-specific health advisory based on pollution levels

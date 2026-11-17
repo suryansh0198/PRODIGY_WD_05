@@ -1,10 +1,11 @@
 import React from 'react';
-import { Activity, ShieldAlert, HeartPulse, Info } from 'lucide-react';
+import { Activity, HeartPulse } from 'lucide-react';
 
 export default function AirQualityCard({ airQuality }) {
   if (!airQuality || !airQuality.usAqi) return null;
 
   const { usAqi, europeanAqi, pollutants, healthAdvice } = airQuality;
+  const euBand = europeanAqi.band || (europeanAqi.value <= 5 ? europeanAqi.value : 3);
 
   return (
     <div className="glass-card rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
@@ -70,9 +71,9 @@ export default function AirQualityCard({ airQuality }) {
 
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-black text-slate-900 dark:text-white">
-              {europeanAqi.value ?? '--'}
+              Band {euBand}
             </span>
-            <span className="text-xs text-slate-400">/ 5 scale</span>
+            <span className="text-xs text-slate-400">/ 5 (Index: {europeanAqi.value})</span>
           </div>
 
           {/* Stepped Scale Progress Meter */}
@@ -80,13 +81,9 @@ export default function AirQualityCard({ airQuality }) {
             {[1, 2, 3, 4, 5].map((step) => (
               <div
                 key={step}
-                className={`rounded-full transition-colors ${
-                  step <= (europeanAqi.value || 0)
-                    ? 'bg-slate-700 dark:bg-slate-300'
-                    : 'bg-slate-200 dark:bg-slate-800'
-                }`}
+                className="rounded-full transition-colors"
                 style={{
-                  backgroundColor: step <= (europeanAqi.value || 0) ? europeanAqi.color : undefined,
+                  backgroundColor: step <= euBand ? europeanAqi.color : undefined,
                 }}
               />
             ))}
