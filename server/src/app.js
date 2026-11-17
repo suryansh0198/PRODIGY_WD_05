@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { getDBStatus } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import weatherRoutes from './routes/weatherRoutes.js';
+import commuteRoutes from './routes/commuteRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/weather', weatherRoutes);
+app.use('/api/commute', commuteRoutes);
 
 // Health check endpoint (includes database status)
 app.get('/api/health', (req, res) => {

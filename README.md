@@ -29,30 +29,43 @@ PRODIGY_WD_05/
 │   │   ├── utils/           # Utilities
 │   │   │   ├── cache.js     # In-memory TTL cache engine (10-15m TTL)
 │   │   │   └── weatherCodes.js # WMO code dictionary & icon mapping
-│   │   ├── services/        # External services
+│   │   ├── services/        # External & Business services
 │   │   │   ├── weatherService.js    # Open-Meteo current & 24h/7d forecast
 │   │   │   ├── airQualityService.js # Open-Meteo AQI (US AQI & European AQI)
-│   │   │   └── geocodingService.js  # Forward & Reverse Geocoding
+│   │   │   ├── geocodingService.js  # Forward & Reverse Geocoding
+│   │   │   └── commuteService.js    # Multi-mode commute scoring engine
 │   │   ├── controllers/     # Request handlers
 │   │   │   ├── authController.js    # Register, Login, Me, UpdatePreferences
-│   │   │   └── weatherController.js # Overview, Current, AQI, Geocode, Reverse-geocode
+│   │   │   ├── weatherController.js # Overview, Current, AQI, Geocode, Reverse-geocode
+│   │   │   └── commuteController.js # Commute recommendation endpoint
 │   │   ├── routes/          # Express route declarations
 │   │   │   ├── authRoutes.js        # /api/auth endpoints
-│   │   │   └── weatherRoutes.js     # /api/weather endpoints
+│   │   │   ├── weatherRoutes.js     # /api/weather endpoints
+│   │   │   └── commuteRoutes.js     # /api/commute endpoints
 │   │   ├── app.js           # Express app instance, middleware & routes
 │   │   └── server.js        # Server listener & DB bootstrap
-│   ├── test/                # Automated native Node.js test suite (30 tests)
+│   ├── test/                # Automated native Node.js test suite (34 tests)
 │   │   ├── health.test.js   # Health check & route tests
 │   │   ├── auth.test.js     # User registration, JWT, and bcrypt tests
-│   │   └── weather.test.js  # Weather, AQI, Geocoding & Cache tests
+│   │   ├── weather.test.js  # Weather, AQI, Geocoding & Cache tests
+│   │   └── commute.test.js  # Multi-mode commute recommendation tests
 │   ├── .env.example         # Environment template
 │   └── package.json
 │
 ├── client/                  # Frontend React + Vite + Tailwind CSS Application
 │   ├── src/
-│   │   ├── App.jsx          # Root component with Dark/Light mode & status
+│   │   ├── components/      # UI component library
+│   │   │   ├── layout/      # Navbar (with autocomplete search), Footer
+│   │   │   ├── weather/     # CurrentWeatherCard, HourlyForecastStrip, AirQualityCard
+│   │   │   ├── commute/     # CommuteScoreCard with mode switcher & departure advisory
+│   │   │   ├── map/         # CommuteMap (Leaflet interactive map with custom pin)
+│   │   │   └── auth/        # AuthModal for Sign In & Registration
+│   │   ├── context/         # React Contexts (AuthContext, WeatherContext)
+│   │   ├── services/        # API clients (api.js, weatherService, authService)
+│   │   ├── utils/           # commuteScorer.js
+│   │   ├── App.jsx          # Root dashboard
 │   │   ├── main.jsx         # React DOM render root
-│   │   └── index.css        # Tailwind directives and glassmorphism utilities
+│   │   └── index.css        # Tailwind directives, Leaflet CSS & glassmorphism utilities
 │   ├── index.html           # Vite HTML entry point
 │   ├── tailwind.config.js   # Tailwind theme customization
 │   ├── vite.config.js       # Vite proxy config (/api -> localhost:5000)
@@ -95,7 +108,7 @@ PRODIGY_WD_05/
    cd server
    npm test
    ```
-   *Runs 30 automated tests across 9 suites covering health checks, user registration, bcrypt password hashing, login, input validation, JWT route guards, in-memory caching, US/EU AQI calculations, forward geocoding, and reverse geocoding.*
+   *Runs 34 automated tests across 10 suites covering health checks, user registration, bcrypt password hashing, login, input validation, JWT route guards, in-memory caching, US/EU AQI calculations, forward geocoding, reverse geocoding, and commute recommendations.*
 
 ---
 
@@ -110,7 +123,7 @@ PRODIGY_WD_05/
 | `GET` | `/api/auth/me` | Protected | Returns authenticated commuter profile (requires `Authorization: Bearer <token>`) |
 | `PUT` | `/api/auth/preferences` | Protected | Update preferred transport mode (`walking`, `cycling`, `two_wheeler`, `transit`, `driving`) |
 
-### 🌦️ Weather & Commute Intelligence (`/api/weather`)
+### 🌦️ Weather & Air Quality (`/api/weather`)
 
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
@@ -119,6 +132,12 @@ PRODIGY_WD_05/
 | `GET` | `/api/weather/air-quality?lat={lat}&lon={lon}` | Public | Air quality index: **US AQI (0-500)** and **European AQI (1-5)** with health advice |
 | `GET` | `/api/weather/geocode?query={cityName}` | Public | Search cities and resolve coordinates via forward geocoding |
 | `GET` | `/api/weather/reverse-geocode?lat={lat}&lon={lon}` | Public | Resolve GPS coordinates into human-readable city/district name |
+
+### 🧭 Commute Intelligence (`/api/commute`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/commute/recommendation?lat={lat}&lon={lon}&mode={mode}` | Public | Mode-tailored viability score (0–100), verdict, impact factors, and weather summary |
 
 ---
 

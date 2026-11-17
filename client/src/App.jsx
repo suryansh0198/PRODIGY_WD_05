@@ -4,8 +4,10 @@ import { WeatherProvider, useWeather } from './context/WeatherContext.jsx';
 import Navbar from './components/layout/Navbar.jsx';
 import Footer from './components/layout/Footer.jsx';
 import CurrentWeatherCard from './components/weather/CurrentWeatherCard.jsx';
+import CommuteScoreCard from './components/commute/CommuteScoreCard.jsx';
 import HourlyForecastStrip from './components/weather/HourlyForecastStrip.jsx';
 import AirQualityCard from './components/weather/AirQualityCard.jsx';
+import CommuteMap from './components/map/CommuteMap.jsx';
 import AuthModal from './components/auth/AuthModal.jsx';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
@@ -58,14 +60,20 @@ function Dashboard() {
           </div>
         ) : weather ? (
           <main className="space-y-6 animate-fade-in">
-            {/* Current Conditions & Commute Heuristics */}
+            {/* Current Conditions & Heuristics */}
             <CurrentWeatherCard weather={weather} location={activeLocation} />
+
+            {/* Personalized Commute Viability Scorer */}
+            <CommuteScoreCard weather={weather} airQuality={weather.airQuality} />
 
             {/* 24-Hour Commuter Hourly Forecast Timeline */}
             <HourlyForecastStrip hourly={weather.hourlyForecast} />
 
             {/* Dual Standard AQI & Respiratory Guidance */}
             <AirQualityCard airQuality={weather.airQuality} />
+
+            {/* Interactive Leaflet Commute Map */}
+            <CommuteMap location={activeLocation} weather={weather} />
           </main>
         ) : (
           <div className="glass-card rounded-3xl p-12 text-center text-sm text-slate-500 shadow-sm">
