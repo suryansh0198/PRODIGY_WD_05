@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { getDBStatus } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import weatherRoutes from './routes/weatherRoutes.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/weather', weatherRoutes);
 
 // Health check endpoint (includes database status)
 app.get('/api/health', (req, res) => {

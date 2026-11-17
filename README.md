@@ -24,16 +24,27 @@ PRODIGY_WD_05/
 │   │   │   └── SavedLocation.js # Saved commute endpoints with lat/long bounds
 │   │   ├── middleware/      # Express middlewares
 │   │   │   ├── authMiddleware.js # JWT Bearer token route protection
-│   │   │   └── validateAuth.js   # Request body & email regex validation
+│   │   │   ├── validateAuth.js   # Request body & email regex validation
+│   │   │   └── validateCoordinates.js # Lat/lon boundary validation (-90..90, -180..180)
+│   │   ├── utils/           # Utilities
+│   │   │   ├── cache.js     # In-memory TTL cache engine (10-15m TTL)
+│   │   │   └── weatherCodes.js # WMO code dictionary & icon mapping
+│   │   ├── services/        # External services
+│   │   │   ├── weatherService.js    # Open-Meteo current & 24h/7d forecast
+│   │   │   ├── airQualityService.js # Open-Meteo AQI (US AQI & European AQI)
+│   │   │   └── geocodingService.js  # Forward & Reverse Geocoding
 │   │   ├── controllers/     # Request handlers
-│   │   │   └── authController.js # Register, Login, Me, UpdatePreferences
+│   │   │   ├── authController.js    # Register, Login, Me, UpdatePreferences
+│   │   │   └── weatherController.js # Overview, Current, AQI, Geocode, Reverse-geocode
 │   │   ├── routes/          # Express route declarations
-│   │   │   └── authRoutes.js     # /api/auth endpoints
+│   │   │   ├── authRoutes.js        # /api/auth endpoints
+│   │   │   └── weatherRoutes.js     # /api/weather endpoints
 │   │   ├── app.js           # Express app instance, middleware & routes
 │   │   └── server.js        # Server listener & DB bootstrap
-│   ├── test/                # Automated native Node.js test suite (15 tests)
+│   ├── test/                # Automated native Node.js test suite (30 tests)
 │   │   ├── health.test.js   # Health check & route tests
-│   │   └── auth.test.js     # User registration, JWT, and bcrypt tests
+│   │   ├── auth.test.js     # User registration, JWT, and bcrypt tests
+│   │   └── weather.test.js  # Weather, AQI, Geocoding & Cache tests
 │   ├── .env.example         # Environment template
 │   └── package.json
 │
@@ -58,7 +69,7 @@ PRODIGY_WD_05/
 
 1. **Start MongoDB**:
    * If running as a Windows service: `net start MongoDB`
-   * Or run local binary: `mongod --dbpath <data_dir>`
+   * Or run local binary: `mongod --dbpath server/data/db`
    * Or set a remote MongoDB Atlas URI in `server/.env` (`MONGO_URI=...`).
 
 2. **Start the Express API Server**:
@@ -84,11 +95,13 @@ PRODIGY_WD_05/
    cd server
    npm test
    ```
-   *Runs 15 automated tests covering health checks, user registration, bcrypt password hashing, login, input validation, and JWT route guards.*
+   *Runs 30 automated tests across 9 suites covering health checks, user registration, bcrypt password hashing, login, input validation, JWT route guards, in-memory caching, US/EU AQI calculations, forward geocoding, and reverse geocoding.*
 
 ---
 
-## 🔐 Authentication Endpoints
+## 📡 REST API Reference
+
+### 🔐 Authentication (`/api/auth`)
 
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
@@ -96,6 +109,16 @@ PRODIGY_WD_05/
 | `POST` | `/api/auth/login` | Public | Authenticate credentials (timing-safe compare, issues 24h JWT) |
 | `GET` | `/api/auth/me` | Protected | Returns authenticated commuter profile (requires `Authorization: Bearer <token>`) |
 | `PUT` | `/api/auth/preferences` | Protected | Update preferred transport mode (`walking`, `cycling`, `two_wheeler`, `transit`, `driving`) |
+
+### 🌦️ Weather & Commute Intelligence (`/api/weather`)
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/weather/overview?lat={lat}&lon={lon}` | Public | Consolidated commuter overview (Current + 24h Forecast + AQI + Place name) |
+| `GET` | `/api/weather/current?lat={lat}&lon={lon}` | Public | Real-time conditions (temperature, feels-like, wind, humidity, precipitation) |
+| `GET` | `/api/weather/air-quality?lat={lat}&lon={lon}` | Public | Air quality index: **US AQI (0-500)** and **European AQI (1-5)** with health advice |
+| `GET` | `/api/weather/geocode?query={cityName}` | Public | Search cities and resolve coordinates via forward geocoding |
+| `GET` | `/api/weather/reverse-geocode?lat={lat}&lon={lon}` | Public | Resolve GPS coordinates into human-readable city/district name |
 
 ---
 
@@ -107,34 +130,6 @@ The original vanilla HTML/CSS/JS application is completely preserved:
    ```bash
    git checkout backup-legacy-vanilla
    ```
-
----
-
-## ✨ Features Roadmap
-
-- 🔍 Search weather by city
-- 📍 Get weather using your current location (with reverse-geocoded place names)
-- 🌡️ Real-time temperature & "feels like" metrics
-- 💨 Wind speed and humidity indicators
-- 🌅 Accurate sunrise and sunset timing
-- ☔ Umbrella & precipitation warnings
-- 🧥 Temperature-calibrated clothing recommendations
-- 🚶 Personalized commute score & mode-specific advice (Walk, Bike, Transit, Drive)
-- 🍃 Dual Air Quality monitoring (US AQI & European AQI standards)
-- 🗺️ Interactive Leaflet map with commute endpoints
-- 🌙 True Light & Dark theme toggle
-- 📱 Mobile-first, fully responsive design
-- 🔐 User authentication with JWT & encrypted passwords (bcrypt)
-- 💾 Saved commute routes ("Home", "Work", "Campus")
-
----
-
-## 🛠️ Technologies Used
-
-- **Frontend**: React, Vite, Tailwind CSS, Lucide Icons
-- **Backend**: Node.js, Express.js, REST APIs, CORS, dotenv
-- **Database & Auth**: MongoDB, Mongoose, JWT (jsonwebtoken), bcryptjs
-- **APIs**: Open-Meteo Weather Forecast, Open-Meteo Air Quality, Geocoding API, Reverse Geocoding API, Browser Geolocation API
 
 ---
 
