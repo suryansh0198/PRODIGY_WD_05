@@ -17,10 +17,23 @@ PRODIGY_WD_05/
 │
 ├── server/                  # Backend Node.js & Express REST API
 │   ├── src/
+│   │   ├── config/          # Database configuration
+│   │   │   └── db.js        # Mongoose connection & status tracker
+│   │   ├── models/          # Mongoose data schemas
+│   │   │   ├── User.js      # Commuter profile, bcrypt pre-save hook, transport mode
+│   │   │   └── SavedLocation.js # Saved commute endpoints with lat/long bounds
+│   │   ├── middleware/      # Express middlewares
+│   │   │   ├── authMiddleware.js # JWT Bearer token route protection
+│   │   │   └── validateAuth.js   # Request body & email regex validation
+│   │   ├── controllers/     # Request handlers
+│   │   │   └── authController.js # Register, Login, Me, UpdatePreferences
+│   │   ├── routes/          # Express route declarations
+│   │   │   └── authRoutes.js     # /api/auth endpoints
 │   │   ├── app.js           # Express app instance, middleware & routes
-│   │   └── server.js        # Server listener entry point
-│   ├── test/                # Automated native Node.js test suite
-│   │   └── health.test.js
+│   │   └── server.js        # Server listener & DB bootstrap
+│   ├── test/                # Automated native Node.js test suite (15 tests)
+│   │   ├── health.test.js   # Health check & route tests
+│   │   └── auth.test.js     # User registration, JWT, and bcrypt tests
 │   ├── .env.example         # Environment template
 │   └── package.json
 │
@@ -41,18 +54,23 @@ PRODIGY_WD_05/
 
 ## 🚀 How to Run
 
-### Option 1: Running the New Full-Stack App (Phase 1)
+### Option 1: Running the Full-Stack App
 
-1. **Start the Express API Server**:
+1. **Start MongoDB**:
+   * If running as a Windows service: `net start MongoDB`
+   * Or run local binary: `mongod --dbpath <data_dir>`
+   * Or set a remote MongoDB Atlas URI in `server/.env` (`MONGO_URI=...`).
+
+2. **Start the Express API Server**:
    ```bash
    cd server
    npm install
    npm run dev
    ```
    *The server starts on `http://localhost:5000`.*
-   *Health check is live at `http://localhost:5000/api/health`.*
+   *Health & database status is live at `http://localhost:5000/api/health`.*
 
-2. **Start the React Frontend Client** (in a second terminal):
+3. **Start the React Frontend Client** (in a second terminal):
    ```bash
    cd client
    npm install
@@ -61,11 +79,23 @@ PRODIGY_WD_05/
    *The client starts on `http://localhost:5173`.*
    *Vite automatically proxies any `/api/*` call to the Express server.*
 
-3. **Run Backend Automated Tests**:
+4. **Run Backend Automated Tests**:
    ```bash
    cd server
    npm test
    ```
+   *Runs 15 automated tests covering health checks, user registration, bcrypt password hashing, login, input validation, and JWT route guards.*
+
+---
+
+## 🔐 Authentication Endpoints
+
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public | Register new commuter account (hashes password with bcryptjs, issues 24h JWT) |
+| `POST` | `/api/auth/login` | Public | Authenticate credentials (timing-safe compare, issues 24h JWT) |
+| `GET` | `/api/auth/me` | Protected | Returns authenticated commuter profile (requires `Authorization: Bearer <token>`) |
+| `PUT` | `/api/auth/preferences` | Protected | Update preferred transport mode (`walking`, `cycling`, `two_wheeler`, `transit`, `driving`) |
 
 ---
 
@@ -103,7 +133,7 @@ The original vanilla HTML/CSS/JS application is completely preserved:
 
 - **Frontend**: React, Vite, Tailwind CSS, Lucide Icons
 - **Backend**: Node.js, Express.js, REST APIs, CORS, dotenv
-- **Database & Auth (Phase 2)**: MongoDB, Mongoose, JWT, bcrypt
+- **Database & Auth**: MongoDB, Mongoose, JWT (jsonwebtoken), bcryptjs
 - **APIs**: Open-Meteo Weather Forecast, Open-Meteo Air Quality, Geocoding API, Reverse Geocoding API, Browser Geolocation API
 
 ---

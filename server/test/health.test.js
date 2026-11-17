@@ -20,7 +20,7 @@ describe('Server Health and Basic Routes', () => {
     await new Promise((resolve) => server.close(resolve));
   });
 
-  test('GET /api/health returns 200 with ok status', async () => {
+  test('GET /api/health returns 200 with ok status and db info', async () => {
     const response = await fetch(`${baseUrl}/api/health`);
     assert.strictEqual(response.status, 200);
 
@@ -29,6 +29,8 @@ describe('Server Health and Basic Routes', () => {
     assert.strictEqual(body.app, 'CommuteCast API');
     assert.strictEqual(body.version, '1.0.0');
     assert.ok(body.timestamp, 'timestamp should be present');
+    assert.ok(body.database, 'database status should be present');
+    assert.ok(typeof body.database.connected === 'boolean', 'database.connected should be boolean');
   });
 
   test('GET / returns 200 welcome message', async () => {
